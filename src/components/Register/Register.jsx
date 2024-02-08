@@ -6,15 +6,18 @@ import {
 } from "firebase/auth";
 import auth from "../../Firebase/firebase.init";
 import { useState } from "react";
+import { FaRegEye } from "react-icons/fa6";
+import { FaRegEyeSlash } from "react-icons/fa6";
 
 const Register = () => {
-//  REACT STATE MANAGE HOOKS
-const [registererror, setRegistererror] = useState("");
-const [success, setSuccess] = useState("");
-const [user, setUser] = useState(null);
+  //  REACT STATE MANAGE HOOKS
+  const [registererror, setRegistererror] = useState("");
+  const [success, setSuccess] = useState("");
+  const [user, setUser] = useState(null);
+  const [showpassword, setShowpassword] = useState(false);
 
-//  GOOGLE AUTHENTICATION 
-const googleAuth = new GoogleAuthProvider();
+  //  GOOGLE AUTHENTICATION
+  const googleAuth = new GoogleAuthProvider();
 
   //   FORM SUBMIT
 
@@ -22,9 +25,21 @@ const googleAuth = new GoogleAuthProvider();
     e.preventDefault();
     const email = e.target.email.value;
     const password = e.target.password.value;
+    const accepted = e.target.terms.checked;
+    console.log(email, password, accepted);
 
     setRegistererror("");
     setSuccess("");
+    if (password.length < 6) {
+      setRegistererror("Password should be at least 6 characters");
+      return;
+    } else if (!/[A-Z]/.test(password)) {
+      setRegistererror("Your password should hava one uppercase character");
+      return;
+    } else if (!accepted) {
+      setRegistererror("Please accept our terms and condition");
+      return;
+    }
 
     createUserWithEmailAndPassword(auth, email, password)
       .then((result) => {
@@ -76,15 +91,28 @@ const googleAuth = new GoogleAuthProvider();
             id=""
             placeholder="email"
             className="w-3/4 mb-4 py-2 px-4 border"
+            required
           />
           <br />
           <input
-            type="password"
+            type={showpassword ? "text" : "password"}
             name="password"
             id=""
             placeholder="password"
             className="w-3/4 mb-4 py-2 px-4 border"
+            required
           />
+          <span onClick={() => setShowpassword(!showpassword)}>
+            {showpassword ? (
+              <FaRegEye></FaRegEye>
+            ) : (
+              <FaRegEyeSlash></FaRegEyeSlash>
+            )}
+          </span>
+          <div>
+            <input type="checkbox" name="terms" id="terms" />
+            <label htmlFor="terms">Accept our terms and condition</label>
+          </div>
           <br />
           <input
             type="submit"
